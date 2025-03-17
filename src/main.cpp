@@ -117,7 +117,7 @@ void onLoraReceive()
   while (mySerial.available() >= 2)
   {
     LoraCommand_t loraCmd;
-    int lenCmd = mySerial.readBytes(&loraCmd.cmd, 1);
+    int lenCmd = mySerial.readBytes(&loraCmd.cmd, 1);//?????
     int lenRSSI = mySerial.readBytes(&loraCmd.rssi, 1);
 
     if (lenCmd == 1 && lenRSSI == 1)
@@ -502,8 +502,12 @@ void vGPSTask(void *pvParameters)
   TickType_t xLastWakeTime = xTaskGetTickCount();
   const TickType_t xFrequency = pdMS_TO_TICKS(100);
 
+  uint16_t devide_send_rate = 2;
+  uint16_t send_counter = 0;
+
   for (;;)
   {
+    send_counter++;
     double latitude, longitude;
     float altitude;
     bool isGPSValid;
@@ -526,8 +530,10 @@ void vGPSTask(void *pvParameters)
     }
 
     // LoRa送信用パケットを作成
-    if (currentMode == ModeCommand::LOGGING)
+
+    if (currentMode == ModeCommand::LOGGING && send_counter % devide_send_rate == 0)
     {
+      send_counter = 0;
       uint8_t txBuffer[28]; // 32 → 28 に変更（floatにしたため）
       if (isGPSValid)
       {
@@ -620,7 +626,8 @@ void processLoraCommand(uint8_t cmd, uint8_t rssi)
            cmd == static_cast<uint8_t>(ServoCommand::ANGLE_MINUS_1) ||
            cmd == static_cast<uint8_t>(ServoCommand::ANGLE_PLUS_1) ||
            cmd == static_cast<uint8_t>(ServoCommand::CLOSE_ANGLE_PLUS) ||
-           cmd == static_cast<uint8_t>(ServoCommand::CLOSE_ANGLE_MINUS))
+           cmd == static_cast<uint8_t>(ServoCommand::CLOSE_ANGLE_MINUS) ||
+           cmd == static_cast<uint8_t>(ServoCommand::OPEN_SERVO))
   {
     can.send(ContentID::KAIHOU_COMMAND, &cmd, 1);
     Serial.println("[DEBUG] サーボ指令送信");

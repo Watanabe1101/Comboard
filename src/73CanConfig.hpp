@@ -54,6 +54,7 @@ enum class ServoCommand : uint8_t
     ANGLE_PLUS_1 = 'm',      // パラシュートオープンの角度を1度大きくする(Startモード時のみ)
     CLOSE_ANGLE_PLUS = 'q',  // パラシュートクローズの角度を1度大きくする(Startモード時のみ)
     CLOSE_ANGLE_MINUS = 'r', // パラシュートクローズの角度を1度小さくする(Startモード時のみ)
+    OPEN_SERVO = 'o',        // サーボオープン
 };
 
 // 離床 or 頂点検知通知(通信内容ID:0x03)
